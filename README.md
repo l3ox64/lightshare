@@ -1,4 +1,4 @@
-# C++ File Sharing Server (WIP)
+# C++ File Sharing Server
 
 This project is a **lightweight and secure file-sharing server written in C++**, designed to provide a **fast and easy-to-use** solution for file sharing.  
 
