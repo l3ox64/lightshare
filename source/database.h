@@ -4,101 +4,97 @@
 #include <iostream>
 #include <pqxx/pqxx>
 
-// 📌 Costanti per la connessione a PostgreSQL
-constexpr auto DB_HOST = "localhost";       // Indirizzo del server PostgreSQL
-constexpr auto DB_PORT = "5432";            // Porta predefinita di PostgreSQL
-constexpr auto DB_NAME = "l3ox";            // Nome del database
-constexpr auto DB_USER = "l3ox";            // Nome utente del database
-constexpr auto DB_PASSWORD = "l3ox";        // Password del database
-constexpr auto DB_TABLE = "crowapp";        // Nome della tabella
+constexpr auto DB_HOST = "localhost";
+constexpr auto DB_PORT = "5432";
+constexpr auto DB_NAME = "l3ox";
+constexpr auto DB_USER = "l3ox";
+constexpr auto DB_PASSWORD = "l3ox";
+constexpr auto DB_TABLE = "crowapp";
+
+using namespace std;
 
 class Database {
 public:
-    Database() {
+		
+	Database() {
         try {
-            // Costruisce la stringa di connessione a PostgreSQL
-            std::string connStr = "host=" + std::string(DB_HOST) +
-                                  " port=" + std::string(DB_PORT) +
-                                  " dbname=" + std::string(DB_NAME) +
-                                  " user=" + std::string(DB_USER) +
-                                  " password=" + std::string(DB_PASSWORD);
+            //PostgreSQL parameters
+            string connStr = "host=" + string(DB_HOST) +
+                                  " port=" + string(DB_PORT) +
+                                  " dbname=" + string(DB_NAME) +
+                                  " user=" + string(DB_USER) +
+                                  " password=" + string(DB_PASSWORD);
 
-            // Crea la connessione
-            conn = std::make_unique<pqxx::connection>(connStr);
+            //String Connection
+            conn = make_unique<pqxx::connection>(connStr);
 
             if (conn->is_open()) {
-                std::cout << "✅ Connessione riuscita a PostgreSQL\n";
+                cout << "Connected to Postgres: "<<DB_HOST<<endl;
             } else {
-                throw std::runtime_error("❌ Errore di connessione a PostgreSQL");
+                throw runtime_error("Connection error to Postgres");
             }
-        } catch (const std::exception& e) {
-            std::cerr << "❌ Errore di connessione: " << e.what() << "\n";
+        } catch (const exception& e) {
+            cerr << "Connection error: Possible wrong parameters: " << e.what() << "\n";
         }
     }
 
     ~Database() {
         if (conn && conn->is_open()) {
-            std::cout << "🔌 Connessione chiusa.\n";
-        }
+            cout << "Connection Closed.\n";
+			conn = nullptr;
+		}
     }
 
-    // 📌 Crea un nuovo utente nella tabella
-    bool createUser(const std::string& username, const std::string& password) {
-        return executeQuery("INSERT INTO " + std::string(DB_TABLE) +
+ 	//CREATE
+    bool createUser(const string& username, const string& password) {
+        return executeQuery("INSERT INTO " + string(DB_TABLE) +
                             " (username, password) VALUES (" +
                             conn->quote(username) + ", " + conn->quote(password) + ")",
-                            "✅ Utente creato: " + username);
+                            "user created: " + username);
     }
-
-    // 📌 Legge un utente dalla tabella
-    bool readUser(const std::string& username) {
+	
+	//READ
+    bool readUser(const string& username) {
         try {
             pqxx::nontransaction txn(*conn);
-            std::string query = "SELECT username FROM " + std::string(DB_TABLE) +
+            string query = "SELECT username FROM " + string(DB_TABLE) +
                                 " WHERE username = " + txn.quote(username);
             pqxx::result result = txn.exec(query);
-
-            if (!result.empty()) {
-                std::cout << "✅ Utente trovato: " << result[0][0].c_str() << "\n";
-                return true;
-            } else {
-                std::cout << "❌ Utente non trovato: " << username << "\n";
-                return false;
-            }
-        } catch (const std::exception& e) {
-            std::cerr << "❌ Errore lettura utente: " << e.what() << "\n";
+			return true;
+        } catch (const exception& e) {
+            cerr << "Error read to DB: " << e.what() << "\n";
             return false;
         }
     }
 
-    // 📌 Aggiorna la password di un utente
-    bool updateUser(const std::string& username, const std::string& newPassword) {
+    //UPDATE
+    bool updateUser(const string& username, const string& newPassword) {
         return executeQuery("UPDATE " + std::string(DB_TABLE) +
                             " SET password = " + conn->quote(newPassword) +
                             " WHERE username = " + conn->quote(username),
-                            "✅ Password aggiornata per: " + username);
+                            "password updated: " + username);
     }
 
-    // 📌 Cancella un utente dalla tabella
-    bool deleteUser(const std::string& username) {
-        return executeQuery("DELETE FROM " + std::string(DB_TABLE) +
+	//DELETE
+    bool deleteUser(const string& username) {
+        return executeQuery("DELETE FROM " + string(DB_TABLE) +
                             " WHERE username = " + conn->quote(username),
-                            "✅ Utente eliminato: " + username);
+                            "user removed: " + username);
     }
 
 private:
-    std::unique_ptr<pqxx::connection> conn;
+    unique_ptr<pqxx::connection> conn;
 
-    // 📌 Funzione generica per eseguire query con messaggi di output
-    bool executeQuery(const std::string& query, const std::string& successMessage) {
+    //create custom query
+    bool executeQuery(const string& query, const string& successMessage) {
         try {
             pqxx::work txn(*conn);
             txn.exec(query);
             txn.commit();
-            std::cout << successMessage << "\n";
+            cout << successMessage << "\n";
             return true;
         } catch (const std::exception& e) {
-            std::cerr << "❌ Errore esecuzione query: " << e.what() << "\n";
+            cerr << "❌ Errore esecuzione query: " << e.what() << "\n";
             return false;
         }
     }

@@ -10,13 +10,11 @@ int main(){
 	load_env_file(".env");
 	Database db;
 	
-	if (!db.readUser("testuser")) {
+	if (db.readUser("testuser")) {
         db.createUser("testuser", "password123");
     }
-
-    db.readUser("testuser");
-    db.updateUser("testuser", "newpassword456");
-    db.deleteUser("testuser");
+	db.updateUser("testuser","nuovapassowrd");
+	db.deleteUser("testuser");
 
 	crow::SimpleApp app;
 
