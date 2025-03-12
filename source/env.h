@@ -1,3 +1,6 @@
+#ifndef ENV_H
+#define ENV_H
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -48,4 +51,4 @@ const char* get_env(const char* var_name) {
     return value;
 }
 
-
+#endif // ENV_H
