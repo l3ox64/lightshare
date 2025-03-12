@@ -4,7 +4,7 @@
 #include <iostream>
 #include <pqxx/pqxx>
 #include <filesystem>
-#include "env.h"  // Include the file that contains load_env_file() and get_env()
+#include "env.h"
 
 using namespace std;
 namespace fs = filesystem;
@@ -17,7 +17,6 @@ private:
 public:
     Database() {
         try {
-            // Load environment file correctly
             string env_path = fs::absolute("../.env").string();
             load_env_file(env_path);
 
@@ -28,11 +27,6 @@ public:
             DB_USER = get_env("DB_USER");
             DB_PASSWORD = get_env("DB_PASSWORD");
             DB_TABLE = get_env("DB_TABLE");
-
-            // Validate environment variables
-            if (DB_HOST.empty() || DB_NAME.empty() || DB_USER.empty()) {
-                throw runtime_error("Missing database configuration variables!");
-            }
 
             // PostgreSQL connection string
             string connStr = "host=" + DB_HOST +
