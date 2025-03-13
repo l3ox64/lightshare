@@ -12,8 +12,8 @@ int main(){
 	createDatabaseAndTable("lightshare","lightshare"); //(dbname, tablename)
 
 	Database db;
-	db.createUser("test","password");
-	db.createUser("Leo","123456");
+	//db.createUser("test","password");
+	//db.createUser("Leo","123456");
 
 	crow::SimpleApp app;
 

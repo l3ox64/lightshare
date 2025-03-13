@@ -17,7 +17,7 @@ private:
 public:
     Database() {
         try {
-            string env_path = fs::absolute("../.env").string();
+            string env_path = fs::absolute(".env").string();
             load_env_file(env_path);
 
             // Store environment variables as class members
@@ -43,6 +43,7 @@ public:
             } else {
                 throw runtime_error("Connection to PostgreSQL failed!");
             }
+
         } catch (const exception& e) {
             cerr << "Database connection error: " << e.what() << "\n";
         }
@@ -54,8 +55,8 @@ public:
             conn->close();
         }
     }
-
-    // CREATE
+	
+    // CREATE 
     bool createUser(const string& username, const string& password) {
         return executeQuery("INSERT INTO " + DB_TABLE +
                             " (username, password) VALUES (" +
