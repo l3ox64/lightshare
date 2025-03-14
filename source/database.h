@@ -5,6 +5,7 @@
 #include <pqxx/pqxx>
 #include <filesystem>
 #include "env.h"
+#include "lightshare.h"
 
 using namespace std;
 namespace fs = filesystem;
@@ -46,7 +47,7 @@ public:
 
         } catch (const exception& e) {
             cerr << "Database connection error: " << e.what() << "\n";
-        }
+		}
     }
 
     ~Database() {
@@ -55,14 +56,22 @@ public:
             conn->close();
         }
     }
-	
+
+
+
     // CREATE 
     bool createUser(const string& username, const string& password) {
-        return executeQuery("INSERT INTO " + DB_TABLE +
+        
+		string dbpass = password;
+		dbpass = bcrypt::generateHash(dbpass);		
+
+		return executeQuery("INSERT INTO " + DB_TABLE +
                             " (username, password) VALUES (" +
-                            conn->quote(username) + ", " + conn->quote(password) + ")",
+                            conn->quote(username) + ", " + conn->quote(dbpass) + ")",
                             "User created: " + username);
     }
+
+
 
     // READ
     bool readUser(const string& username) {
@@ -79,7 +88,7 @@ public:
     }
 
     // UPDATE
-    bool updateUser(const string& username, const string& newPassword) {
+    bool updateUserPass(const string& username, const string& newPassword) {
         return executeQuery("UPDATE " + DB_TABLE +
                             " SET password = " + conn->quote(newPassword) +
                             " WHERE username = " + conn->quote(username),

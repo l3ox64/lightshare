@@ -13,8 +13,10 @@ int main(){
 
 	Database db;
 	db.createUser("test","password");
-	db.createUser("Leo","123456");
-
+	//db.createUser("Leo","123456");
+	//db.deleteUser("Leo");
+	//db.deleteUser("test");
+	//db.updateUserPass("Leo","ciao");
 	crow::SimpleApp app;
 
 	CROW_ROUTE(app, "/home")([](){

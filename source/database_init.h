@@ -77,7 +77,7 @@ bool createDatabaseAndTable(const string& dbName, const string& tableName) {
             string createTableQuery =
                 "CREATE TABLE " + tableName + " ("
                 "id SERIAL PRIMARY KEY, "
-                "username VARCHAR(100), "
+                "username VARCHAR(100) UNIQUE, "
                 "password TEXT NOT NULL, "
 				"created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
                 ")";
